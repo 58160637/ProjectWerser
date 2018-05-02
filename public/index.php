@@ -16,4 +16,9 @@ $app->get('/hello/{name}', function (Request $request, Response $response, array
 
 //Customers routes
 require '../src/routes/Customers.php';
+//Reply routes
+require '../src/routes/Reply.php';
+//Webboard routes
+require '../src/routes/Webboard.php';
+
 $app->run();

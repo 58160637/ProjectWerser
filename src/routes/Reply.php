@@ -2,13 +2,9 @@
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
 
-$app = new \Slim\App;
 
-
-
-
-//Get AlL Reply
-$app->get('/api/reply', function(Request $request, Response $response){
+///Get AlL Reply
+$app->get('/api/replys', function(Request $request, Response $response){
     $sql = "SELECT * FROM reply";
     try{
         // Get DB Object
@@ -16,143 +12,95 @@ $app->get('/api/reply', function(Request $request, Response $response){
         // Connect
         $db = $db->connect();
         $stmt = $db->query($sql);
-        $replyID = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $reply = $stmt->fetchAll(PDO::FETCH_OBJ);
         $db = null;
-        echo json_encode($replyID);
+        echo json_encode($reply);
     } catch(PDOException $e){
         echo '{"error": {"text": '.$e->getMessage().'}';
     }
 });
 
-// Get Single Question
+// Get Single reply
 $app->get('/api/reply/{id}', function(Request $request, Response $response){
     $id = $request->getAttribute('id');
-    $sql = "SELECT * FROM reply WHERE id = $id";
+    $sql = "SELECT * FROM reply WHERE ReplyID = $id";
     try{
         // Get DB Object
         $db = new db();
         // Connect
         $db = $db->connect();
         $stmt = $db->query($sql);
-        $QuestionID = $stmt->fetch(PDO::FETCH_OBJ);
+        $reply = $stmt->fetch(PDO::FETCH_OBJ);
         $db = null;
-        echo json_encode($QuestionID);
+        echo json_encode($reply);
     } catch(PDOException $e){
         echo '{"error": {"text": '.$e->getMessage().'}';
     }
 });
 
-// Get Single CreateDate
-$app->get('/api/reply/{id}', function(Request $request, Response $response){
-    $id = $request->getAttribute('id');
-    $sql = "SELECT * FROM reply WHERE id = $id";
-    try{
-        // Get DB Object
-        $db = new db();
-        // Connect
-        $db = $db->connect();
-        $stmt = $db->query($sql);
-        $CreateID = $stmt->fetch(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($CreateID);
-    } catch(PDOException $e){
-        echo '{"error": {"text": '.$e->getMessage().'}';
-    }
-});
-
-// Get Single Details
-$app->get('/api/reply/{id}', function(Request $request, Response $response){
-    $id = $request->getAttribute('id');
-    $sql = "SELECT * FROM reply WHERE id = $id";
-    try{
-        // Get DB Object
-        $db = new db();
-        // Connect
-        $db = $db->connect();
-        $stmt = $db->query($sql);
-        $Details = $stmt->fetch(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($Details);
-    } catch(PDOException $e){
-        echo '{"error": {"text": '.$e->getMessage().'}';
-    }
-});
-
-// Get Single Name
-$app->get('/api/reply/{id}', function(Request $request, Response $response){
-    $id = $request->getAttribute('id');
-    $sql = "SELECT * FROM reply WHERE id = $id";
-    try{
-        // Get DB Object
-        $db = new db();
-        // Connect
-        $db = $db->connect();
-        $stmt = $db->query($sql);
-        $Name = $stmt->fetch(PDO::FETCH_OBJ);
-        $db = null;
-        echo json_encode($Name);
-    } catch(PDOException $e){
-        echo '{"error": {"text": '.$e->getMessage().'}';
-    }
-});
-
-// Add Customer
+// Add reply
 $app->post('/api/reply/add', function(Request $request, Response $response){
+    $QuestionID = $request->getParam('QuestionID');
+    $CreateDate = $request->getParam('CreateDate');
     $Details = $request->getParam('Details');
     $Name = $request->getParam('Name');
     
-    $sql = "INSERT INTO reply (Details,Name) VALUES
-    (:Details,:Name,)";
+    $sql = "INSERT INTO reply (QuestionID,CreateDate,Details,Name) VALUES
+    (:QuestionID,:CreateDate,:Details,:Name)";
     try{
         // Get DB Object
         $db = new db();
         // Connect
         $db = $db->connect();
         $stmt = $db->prepare($sql);
-        $stmt->bindParam(':Details', $Details);
-        $stmt->bindParam(':Name',  $Name);
+        $stmt->bindParam(':QuestionID', $QuestionID);
+        $stmt->bindParam(':CreateDate',  $CreateDate);
+        $stmt->bindParam(':Details',      $Details);
+        $stmt->bindParam(':Name',      $Name);
      
         $stmt->execute();
-        echo '{"notice": {"text": "Customer Added"}';
+        echo '{"notice": {"text": "Reply Added"}';
     } catch(PDOException $e){
         echo '{"error": {"text": '.$e->getMessage().'}';
     }
 });
-// Update Customer
-$app->put('/api/customer/update/{id}', function(Request $request, Response $response){
+// Update reply
+$app->put('/api/reply/update/{id}', function(Request $request, Response $response){
 
     $id = $request->getAttribute('id');
 
-    $fristName = $request->getParam('fristName');
-    $surName = $request->getParam('surName');
-    $phone = $request->getParam('phone');
+    $QuestionID = $request->getParam('QuestionID');
+    $CreateDate = $request->getParam('CreateDate');
+    $Details = $request->getParam('Details');
+    $Name = $request->getParam('Name');
 
-    $sql = "UPDATE customers SET
-				fristName 	= :fristName,
-				surName 	= :surName,
-                phone		= :phone
-
-			WHERE id = $id";
+    $sql = "UPDATE reply SET
+                QuestionID   = :QuestionID,
+                CreateDate   = :CreateDate,
+                Details      = :Details,
+                Name         = :Name
+            WHERE ReplyID = $id";
     try{
         // Get DB Object
         $db = new db();
         // Connect
         $db = $db->connect();
         $stmt = $db->prepare($sql);
-        $stmt->bindParam(':fristName', $fristName);
-        $stmt->bindParam(':surName',  $surName);
-        $stmt->bindParam(':phone',      $phone);
+        $stmt->bindParam(':QuestionID', $QuestionID);
+        $stmt->bindParam(':CreateDate',  $CreateDate);
+        $stmt->bindParam(':Details',      $Details);
+        $stmt->bindParam(':Name',      $Name);
         $stmt->execute();
-        echo '{"notice": {"text": "Customer Updated"}';
+        echo '{"notice": {"text": "Reply Updated"}';
     } catch(PDOException $e){
         echo '{"error": {"text": '.$e->getMessage().'}';
     }
 });
 
-// Delete Customer
-$app->delete('/api/customer/delete/{id}', function(Request $request, Response $response){
+// Delete reply
+$app->delete('/api/reply/delete/{id}', function(Request $request, Response $response){
     $id = $request->getAttribute('id');
-    $sql = "DELETE FROM customers WHERE id = $id";
+    $sql = "DELETE FROM reply WHERE ReplyID = $id";
     try{
         // Get DB Object
         $db = new db();
@@ -161,7 +109,7 @@ $app->delete('/api/customer/delete/{id}', function(Request $request, Response $r
         $stmt = $db->prepare($sql);
         $stmt->execute();
         $db = null;
-        echo '{"notice": {"text": "Customer Deleted"}';
+        echo '{"notice": {"text": "Reply Deleted"}';
     } catch(PDOException $e){
         echo '{"error": {"text": '.$e->getMessage().'}';
     }
