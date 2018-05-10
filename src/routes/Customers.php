@@ -32,8 +32,13 @@ $app->get('/api/customer/{id}', function(Request $request, Response $response){
         $db = $db->connect();
         $stmt = $db->query($sql);
         $customer = $stmt->fetch(PDO::FETCH_OBJ);
+        if($customer){
+            return $response->withJson(array('customer' => 'true','result'=>$customer),200);
+        }else{
+            return $response->withJson(array('customer' => 'customer Not Found'),422);
+        }
         $db = null;
-        echo json_encode($customer);
+        //echo json_encode($customer);
     } catch(PDOException $e){
         echo '{"error": {"text": '.$e->getMessage().'}';
     }
